@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>jahia-modules</artifactId>
+        <groupId>org.jahia.modules</groupId>
+        <version>8.2.0.0</version>
+    </parent>
+    <artifactId>tenet-prepackaged-website</artifactId>
+    <groupId>com.gladtek.jahia.modules</groupId>
+    <name>TENET pre-packaged website</name>
+    <version>0.1.0</version>
+    <packaging>bundle</packaging>
+    <description>This is the custom module (TENET pre-packaged website) for running on a Jahia server.</description>
+
+    <scm>
+        <connection>scm:git:git@github.com:Gladtek/tenet-prepackaged-website.git</connection>
+        <developerConnection>scm:git:git@github.com:Gladtek/tenet-prepackaged-website.git</developerConnection>
+        <url>https://github.com/Gladtek/tenet-prepackaged-website</url>
+      <tag>HEAD</tag>
+  </scm>
+
+    <properties>
+        <jahia-module-type>system</jahia-module-type>
+        <jahia-depends>default,tenet</jahia-depends>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>jahia-public</id>
+            <name>Jahia Public Repository</name>
+            <url>https://devtools.jahia.com/nexus/content/groups/public</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${project.build.directory}/classes/META-INF/prepackagedSites</directory>
+                <includes>
+                    <include>tenet.zip</include>
+                </includes>
+                <targetPath>META-INF/prepackagedSites</targetPath>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>build-tenet-website</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <zip destfile="${project.build.directory}/dist/tenet.zip" basedir="${basedir}/src/main/tenet-prepackaged-website" />
+                                <zip destfile="${project.build.directory}/classes/META-INF/prepackagedSites/tenet.zip">
+                                    <fileset dir="${project.build.directory}/dist" />
+                                    <fileset dir="${basedir}/src/main/prepackagedSites" includes="export.properties" />
+                                </zip>
+                                <delete dir="${project.build.directory}/dist" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>target/classes/META-INF/prepackagedSites/tenet.zip</file>
+                                    <type>zip</type>
+                                    <classifier>import</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
